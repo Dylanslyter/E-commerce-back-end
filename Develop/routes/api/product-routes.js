@@ -102,6 +102,13 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Product not found.' });
     }
 
+    // Delete the product tags associated with this product
+    await ProductTag.destroy({
+      where: {
+        product_id: productId
+      }
+    });
+
     // Delete the product
     await Product.destroy({
       where: {
@@ -116,6 +123,7 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete product.' });
   }
 });
+
 
 
 module.exports = router;

@@ -1,6 +1,6 @@
 
 const router = require('express').Router();
-const { Category, Product } = require('../../models');
+const { Category, Product, ProductTag} = require('../../models');
 
 // The `/api/categories` endpoint
 
@@ -59,22 +59,48 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update category.' });
   }
 });
-
 router.delete('/:id', async (req, res) => {
   try {
-    // Delete a category by its `id` value
-    const deletedCategoryCount = await Category.destroy({
-      where: { id: req.params.id },
+    const categoryId = req.params.id;
+
+    // Delete records from product_tag table first
+    await ProductTag.destroy({
+      where: { product_id: null } // Assuming product_id is a foreign key in product_tag referencing product
     });
+
+    // Then find and delete all products belonging to the category
+    const products = await Product.findAll({
+      where: { category_id: categoryId }
+    });
+
+    for (const product of products) {
+      // Delete the product and its associated product_tag records
+      await ProductTag.destroy({
+        where: { product_id: product.id }
+      });
+
+      await product.destroy();
+    }
+
+    // Finally, delete the category record
+    const deletedCategoryCount = await Category.destroy({
+      where: { id: categoryId }
+    });
+
     if (deletedCategoryCount === 0) {
       return res.status(404).json({ error: 'Category not found.' });
     }
+
     res.status(200).json({ message: 'Category deleted successfully.' });
   } catch (error) {
     console.error(error);
-    
+    res.status(500).json({ error: 'Failed to delete category.' });
   }
-})
+});
+
+
+
+
 
 module.exports = router;
 

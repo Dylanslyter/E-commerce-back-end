@@ -41,4 +41,4 @@ INSERT INTO product_tag (product_id, tag_id) VALUES
 (7, 4),
 (8, 4);
 
-SET FOREIGN_KEY_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 0;
