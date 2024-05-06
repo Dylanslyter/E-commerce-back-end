@@ -1,6 +1,4 @@
 
-
-
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
 
@@ -77,4 +75,6 @@ router.delete('/:id', async (req, res) => {
     
   }
 })
+
+module.exports = router;
 
